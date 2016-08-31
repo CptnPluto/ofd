@@ -1,12 +1,12 @@
 NAME1		= bsq
 NAME2		= test_in
-FILENAME1	= main.c
+FILENAME1	= errorchecked.c
 FILENAME2	= tester.c
 
 CC 			= gcc
 CFLAGS		= -Wall -Wextra -Werror
 
-all: $(NAME1) $(NAME2)
+all: $(NAME1)
 	
 $(NAME1):
 	$(CC) $(CFLAGS) -o $(NAME1) $(FILENAME1)

@@ -96,7 +96,6 @@ int		test_errors(char *buff)
 		}
 		while ()
 		{
-
 			return (0);
 		}
 	}
