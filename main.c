@@ -1,21 +1,106 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dnessaiv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/08/30 13:44:21 by dnessaiv          #+#    #+#             */
-/*   Updated: 2016/08/30 13:44:21 by dnessaiv         ###   ########.fr       */
+/*   Created: 2016/08/31 00:08:50 by dnessaiv          #+#    #+#             */
+/*   Updated: 2016/08/31 00:08:53 by dnessaiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
 #include <stdlib.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/uio.h>
 #include <unistd.h>
-#include <stdio.h>
+#include "ft_list.h"
+
+#define MAX_READ 4096
+
+/*
+** Keep CPY_TYPE as char to trigger autovectorization (-O3)
+*/
+
+#define CPY_TYPE char
+#define	CPY_WSIZE sizeof(CPY_TYPE)
+#define CPY_WMASK (CPY_WSIZE - 1)
+
+void	ft_memcpy_aligned(void *dst, void *src, size_t length)
+{
+	size_t	t;
+
+	if (!src)
+		return ;
+	src += length;
+	dst += length;
+	t = length / CPY_WSIZE;
+	while (t > 0)
+	{
+		src -= CPY_WSIZE;
+		dst -= CPY_WSIZE;
+		*(CPY_TYPE*)dst = *(CPY_TYPE*)src;
+		t--;
+	}
+}
+
+char	*ft_realloc(char *buf, ssize_t *buf_cap)
+{
+	ssize_t	old_cap;
+	char	*newbuf;
+
+	old_cap = *buf_cap;
+	*buf_cap = old_cap * 2;
+	newbuf = malloc(*buf_cap);
+	ft_memcpy_aligned(newbuf, buf, old_cap);
+	free(buf);
+	return (newbuf);
+}
+
+char	*ft_read_input(int fd)
+{
+	ssize_t	read_size;
+	char	*buf;
+	ssize_t buf_cap;
+	ssize_t buf_offset;
+
+	buf_cap = MAX_READ / 2;
+	buf = ft_realloc(NULL, &buf_cap);
+	buf_offset = 0;
+	while ((read_size = read(fd, buf + buf_offset, MAX_READ)) > 0)
+	{
+		buf_offset = buf_offset + read_size;
+		if (buf_cap - buf_offset < MAX_READ + 1)
+			buf = ft_realloc(buf, &buf_cap);
+	}
+	buf[buf_offset] = 0;
+	return (buf);
+}
+
+int		test_errors(char *buff)
+{
+	int i;
+	int size;
+
+	size = 0;
+	i = 4;
+	if (buff[i] != '\n')
+		return (0);
+	i++;
+	while (buff[i])
+	{
+		while (buff[i] != '\n')
+		{
+			i++;
+			size++;
+		}
+		while ()
+		{
+
+			return (0);
+		}
+	}
+}
 
 int ft_puterror(char *str)
 {
@@ -29,153 +114,159 @@ int ft_puterror(char *str)
 	return (0);
 }
 
-int	line_size(fd)
-{	
-	char	buffer;
-	int		j;
-
-	j = 1;
-	buffer = 0;
-	while (buffer != '\n')
-	{
-		read(fd, &buffer, 1);
-		j++;
-	}
-	lseek(fd, -j, SEEK_END);
-	return (j);
+void	check_errors(buffer)
+{
+	check true instances
+	otherwise 
+		return (0);
 }
 
-int		create_2D_array(int fd, int length, char **map)
+char 	**build_2d(buffer, width, height)
 {
-	char	buffer;
-	int		ret;
-	int		i;
-	int		j;
-	
-	ret = 1;
-	j = 0;
+	char **our_array
+	int index;
+	int i;
+	int j;
+
 	i = 0;
-
-	printf("Start creation:\n");
-
-	while (i < length && ret)										// While row count within parameters.	
+	j = 0;
+	index = 5;
+	our_array = malloc (sizeof(char *) * width)
+	while (buffer[index])
 	{
-		printf("start buffer : %c\n", buffer);
-
-		while ((ret = read(fd, &buffer, 1)))							// While we're not at the end of file.
+		while (i < height)
 		{
-			j = 0;															// First column.
-
-			printf("fd : %d\n", fd);
-			printf("ret : %d\n", ret);
-			printf("current buffer: %c\n", buffer);
-
-			map[i] = (char *)malloc(sizeof(char) * line_size(fd));
-
-			printf("Successfully allocated.\n");
-
-			while (buffer != '\n' && ret)									// While we're not at end of line.
-			{
-				map[i][j] = buffer;												// Assign current buffer value to second dimension array.
-				j++;
-
-				printf("j = %d\n", j);
-				printf("Current Buffer : %c\n", buffer);
-				printf("Current Address Value: %c\n", map[i][j]);
-
-				ret = read(fd, &buffer, 1);										// Read next char from file.
-
-				printf("Buffer2 : %c\n\n", buffer);
-			}
-
-			printf("++++++++++++++++++++++BREAK LOOP 3+++++++++++++++++++\n\n");
-
-			map[i][j] = buffer;												// Assign /n character to end of array.
-			i++;															// Go to next row.
-
-			printf("Current i : %d\n", i);
-			printf("Current ret : %d\n\n", ret);
+			our_array[i] = malloc(sizeof * width)
+			i++;
 		}
-
-		printf("++++++++++++++++++++++BREAK LOOP 2+++++++++++++++++++\n\n");
-
-	}
-	
-	printf("++++++++++++++++++++++BREAK LOOP 1+++++++++++++++++++\n\n");
-
-	printf("%d\n", length);
-	printf("%d\n", i);
-
-	return (0);
-	if (length != i || map[i - 1][j - 1] != '\n')					// Check if listed length of file is dif from actual length
-		return (0);													// or if final char is not a newline.
-	return (1);
+		i = 0;
+		while (i < height && buffer[index])
+		{
+			if (buffer[index] = '\n')
+			{
+				index++;
+				i++;
+			}
+			while (j < width && buffer[index])
+			{
+				our_array[i][j] = buffer[index];
+				j++;
+				index++;
+			}
+			i++;
+		}
+	}	
 }
 
-int	main(int argc, char **argv)
+int get_width(buffer)
 {
-	char 	**map;
-	char	instructions[5];
-	char	empty;
-	char	obstacle;
-	char	full;
-	int		length;
-	int		fd;
+	int i;
+	int width;
 
-	printf("Number of arg : %d\n", argc);
-	printf("Beginning of function\n");
+	width = 0;
+	i = 6
+	if (buffer)
+	{
+		while (buffer[i] != '\n' && buffer[i])
+		{
+			++width;
+			++i;
+		}
+	}
+	return (width);
+}
 
-	argv	= 0;
-	fd		= 0;
-	if (argc > 1)
-		fd = open("file", O_RDWR | O_APPEND, S_IRUSR | S_IWUSR);	//	Open up file with all permissions in APPEND mode.
-	if (read(fd, &instructions, 5) != 5 || instructions[4] != '\n')	//	Check if the instruction line is a valid line.
-		return (ft_puterror("map error"));
-	//length		= instructions[0];
-	length		= 3;												// replace with atoi
-	empty		= instructions[1];
-	obstacle	= instructions[2];
-	full		= instructions[3];
+t_iterators solve_array(our_array, height, width)
+{
+	int i;
+	int j;
+	t_iterators	coordinates;
 
-	printf("Length : %d\n", length);	
+	coordinates.size = 0
+	i = 0;
+	j = 0;
+	while (i < heigth)
+	{
+		while (j < width)
+		{
+			coordinates.x = i;
+			coordinates.y = j;
+			if (size < gsq(our_array, coordinates, obstacle, coordinates.size))
+			{
+				coordinates.prime_x = i;
+				coordinates.prime_y = j;
+				coordinates.size = gsq(our_array, coordinates, obstacle, coordinates.size)
+			}
+			j++;
+		}
+		i++;
+	}
+	return (coordinates);
+}
 
-	if (!(map = (char **)malloc(length * sizeof(char *)) + 1))		// Allocate first dimension of 2D array.
-		return (ft_puterror("map error"));
+void	mod_array(char **our_array, t_iterator coordinates, full)
+{
+	int i;
+	int j;
+	while (i<size)
+	{
+		while (j<size)
+		{
+			our_array[(coordinates.prime_x)+i][(coordinates.prime_y)+j] = full
+			j++;
+		}
+		i++;
+	}
+}
 
-	printf("Length : %d\n", length);
+void	outputs_array(int width, int height, char **our_array)
+{
+	int i;
+	int j;
 
-	if (!(create_2D_array(fd, length, map)))						// Create 2d array.
-		return (ft_puterror("map error"));
-
-	return (0);
+	i = 0;
+	j = 0;
+	while (i < height)
+	{
+		while (j < width)
+		{
+			write(1, our_array[i][j], 1);
+			j++;
+		}
+		i++;
+	}
 }
 
 
+int main()
+{
+	int			i;
+	int			j;
+	int			width;
+	int			height;
+	char		instructions[5];
+	char		**our_array;
+	t_iterator	coordinates;
 
+	i = 0;
+	j = 0;
+	buffer		= get_buffer;
+	height		= ft_atoi(buffer[0]);
+	empty		= buffer[1];
+	obstacle	= buffer[2];
+	full		= buffer[3];
 
+	width = get_width(buffer);
 
+	check_errors(buffer, width);
 
+	our_array = build_2d(buffer, width, height);
 
+	coordinates = solve_array(our_array, height, width, obstacle);
 
+	mod_array(our_array, coordinates)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	greatest_square_size(our_array, i, j);
+	return (0);
+}
 
