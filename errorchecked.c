@@ -145,6 +145,7 @@ char 	**build_2d(char *buffer, int width, int height)											//Builds 2D arra
 	j = 0;
 	index = 5;
 //	printf("HERE THEN?\n");
+	printf("#1 Current buffer: %c  -  i = %d  -  j = %d\n", buffer[index], i, j);
 	our_array = (char **)malloc (sizeof(char *) * width);//doesn't seem to be the issue
 	while (i < height)
 	{
@@ -165,21 +166,25 @@ char 	**build_2d(char *buffer, int width, int height)											//Builds 2D arra
  */
 		while (i < height && buffer[index])
 		{
-			while (j < width && buffer[index])
+			while (j <= width && buffer[index])
 			{
+				//This is an error. Should already be checked in check_errors.
 				if (buffer[index] == '\n')
 				{
-					index++;
+					//index++;
 					i++;
+					j++;
+					printf("#2 Current buffer: %c  -  i = %d  -  j = %d\n", buffer[index], i, j);
 				}
 				else
 					our_array[i][j] = buffer[index];
 					index++;
 					j++;
+					printf("#3 Current buffer: %c  -  i = %d  -  j = %d\n", buffer[index], i, j);
 
 			}
 			j=0;
-		//	i++;//suspicious of this.. in what case will the character after width not be a \n ?
+		// i++;//suspicious of this.. in what case will the character after width not be a \n ?
 		}
 	
 	return our_array;
@@ -191,7 +196,7 @@ int get_width(char *buffer)																		// Gets width of first line from bu
 	int width;
 
 	width = 0;
-	i = 6;
+	i = 5;
 	if (buffer)
 	{
 		while (buffer[i] != '\n' && buffer[i])
@@ -225,6 +230,8 @@ t_iterators solve_array(char **our_array, int height, int width, char obstacle)	
 				coordinates.prime_x = i;
 				coordinates.prime_y = j;
 				coordinates.size = gsq(our_array, coordinates, coordinates.size, obstacle);
+				printf("Coordinates: (%d, %d)\n", coordinates.prime_x, coordinates.prime_y);
+				printf("Size = %d\n", coordinates.size);
 			}
 			j++;
 		}
@@ -301,20 +308,25 @@ int main()
 	printf("\n");
 	i=0;
 	height		= atoi(&buffer[0]);//needs to be changed to ft_atoi with our own implementation
-//	printf("atoi says height is %d\n",height);
+	printf("atoi says height is %d\n",height);
 	empty		= buffer[1];
 	obstacle	= buffer[2];
 	full		= buffer[3];
 //	printf("DOES THIS WORK?\n");
 	width = get_width(buffer);
-//	printf("WIDTH : %d\n",width);
+	printf("WIDTH : %d\n",width);
 	//check_errors(buffer, width);
 //	printf("SO THE ERROR IS BROUGHT TO THE SURFACE IN build_2d? \n");
 	our_array = build_2d(buffer, width, height);
+	printf("Current array:\n");
+	output_array(width, height, our_array);															// Check if array was properly created.
+	printf("\n");
 //	printf("HOW ABOUT BUILD 2D?\n");
 	//successfully build and print maps if they're valid.
 
 	coordinates = solve_array(our_array, height, width, obstacle);
+	printf("Expected coordinates: (0, 3)\n");
+	printf("Actual coordinates:   (%d, %d)\n", coordinates.prime_x, coordinates.prime_y);
 //	printf("HOW FAR WE HAVE COME\n");
 	mod_array(our_array, coordinates, full);
 //	printf("WHY NO ERRORS?\n");
